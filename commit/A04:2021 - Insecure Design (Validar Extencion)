@@ -3,9 +3,10 @@
 		file_put_contents('tmp/'.$id_Usuario,base64_decode($jsB['data']));
 		$jsB['data'] = '';
 
-// ============= CORRECCIÓN: A04:2021 - Insecure Desing - (Verificar que la informacion sea base64 valida) ========== //
-    $base64_str = $data['data'];
-    if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $base64_str)) {
-        die('{"R":-5}');
+// =========================== CORRECCIÓN: A04:2021 - Insecure Design (Validar Extencion) =========================== //
+    $allowed_extensions = ['png', 'jpg', 'jpeg']; // Extensiones permitidas
+    $ext = strtolower(pathinfo($data['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowed_extensions) || $ext !== strtolower($data['ext'])) {
+        die('{"R":-4}');
     }
 // =================================================================================================================== //
