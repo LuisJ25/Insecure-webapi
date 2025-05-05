@@ -1,0 +1,52 @@
+// ======================================= Vulnerable (Registro) =========================================================//
+    try {
+			$R = $db->exec('insert into Usuarios values(null,"'.$jsB['uname'].'","'.$jsB['email'].'",md5("'.$jsB['password'].'"))');
+		}catch (Exception $e){
+			echo '{"R":-2}';
+			return;
+		}
+
+// ============================= CORRECCIÓN: A03:2021 - Injection (SQL REGISTRO) ======================================= //
+        $stmt = $db->prepare('INSERT INTO Usuarios VALUES (null, ?, ?, ?)');
+        $stmt->execute([$data['uname'], $data['email'], $hash]);
+
+// ===================================================================================================================== //
+
+
+// ======================================= Vulnerable (Login) ===========================================================//
+    
+		try {
+			$R = $db->exec('Select id from Usuarios where uname = 
+							"'.$jsB['uname'].'" and password = md5 
+							("'.$jsB['password'].'");');
+		}
+
+// ============================= CORRECCIÓN: A03:2021 - Injection (SQL LOGIN) ========================================== //
+        try {
+        $stmt = $db->prepare('SELECT id, password FROM Usuarios WHERE uname = ?');
+        $stmt->execute([$data['uname']]);
+        $user = $stmt->fetch();
+
+        if (!$user || !password_verify($data['password'], $user['password'])) {
+            die('{"R":-3}');
+        }
+
+// ===================================================================================================================== //
+
+
+// ======================================= Vulnerable (Imagen) ===========================================================//
+    
+		try {
+			$R = $db->exec('select id_Usuario from AccesoToken where token = "'.$TKN.'"');
+		}catch (Exception $e){
+			echo '{"R":-2}';
+			return;
+		}
+
+// ============================= CORRECCIÓN: A03:2021 - Injection (SQL LOGIN) ========================================== //
+    $user = $db->exec('SELECT id_Usuario FROM AccesoToken WHERE token = ?', [$data['token']]);
+    if (empty($user)) {
+        die('{"R":-3}');
+    }
+
+// ===================================================================================================================== //
