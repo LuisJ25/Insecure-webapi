@@ -1,0 +1,9 @@
+// =============================== No se valida la informacion (email)=========================================//
+
+$R = array_key_exists('uname',$jsB) && array_key_exists('email',$jsB) && array_key_exists('password',$jsB);
+
+// ===================== CORRECCIÓN: A04:2021 - Insecure Design (Validación de email) ======================== //
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        die('{"R":-6}');
+    }
+// ========================================================================================================== //
