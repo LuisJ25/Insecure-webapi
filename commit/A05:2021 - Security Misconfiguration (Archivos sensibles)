@@ -1,0 +1,26 @@
+// =============================== Archivos Sensibles a la vista en el navegador =======================================//
+		function($f3) {
+		$dbcnf = loadDatabaseSttings('db.json');
+		$db=new DB\SQL(
+			'mysql:host=localhost;port='.$dbcnf['port'].';dbname='.$dbcnf['dbname'],
+			$dbcnf['user'],
+			$dbcnf['password']
+		);
+
+// ======================= CORRECCIÓN: A05:2021 - Security Misconfiguration (Archivos sensibles) ====================== //
+
+    $dbcnf = loadDatabaseSettings('config/db.json');
+
+// ==================================================================================================================== //
+
+// ======================================= Modificacion del archivo .htaccess ==========================================//
+RewriteEngine On
+
+RewriteRule ^(composer\.json|\.env|\.ini)$ - [R=404,L]
+RewriteRule ^(app|dict|ns|tmp|img|vendor|config)\/|\.ini$ - [R=404,L]
+
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* index.php [L,QSA]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
