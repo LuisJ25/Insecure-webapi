@@ -1,0 +1,23 @@
+// ===================== Buscar imagen y enviarla (Vulnerable) ======================== //
+		try {
+			$R = $db->exec('Select name,ruta from Imagen where id = '.$idImagen);  
+		}
+		catch (Exception $e){
+			echo '{"R":-3}';
+			return;
+		}
+// ==================================================================================== //
+
+// ===== CORRECCIÓN: A01:2021 - Broken Access Control (Verificación de usuarios) ======== //
+    try {
+        $image = $db->exec('SELECT i.name, i.ruta 
+                           FROM Imagen i
+                           JOIN AccesoToken at ON i.id_Usuario = at.id_Usuario
+                           WHERE i.id = ? AND at.token = ?', 
+                          [$data['id'], $data['token']]);
+        
+        if (empty($image)) {
+            echo '{"R":-4,"error":"Imagen no encontrada o no tienes permisos"}';
+            return;
+        }
+// ===================================================================================== //
